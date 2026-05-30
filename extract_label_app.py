@@ -24,20 +24,39 @@ if 'audit_excel_bytes' not in st.session_state:
     st.session_state['audit_excel_bytes'] = None
 if 'metrics' not in st.session_state:
     st.session_state['metrics'] = {'unique': 0, 'missing': 0}
+if 'facility_numbers_text_area' not in st.session_state:
+    st.session_state['facility_numbers_text_area'] = ''
+if 'csv_uploader_key_version' not in st.session_state:
+    st.session_state['csv_uploader_key_version'] = 0
+
+
+def clear_all_data():
+    st.session_state['raw_copied_text'] = ''
+    st.session_state['uploaded_files'] = []
+    st.session_state['show_results'] = False
+    st.session_state['main_excel_bytes'] = None
+    st.session_state['audit_excel_bytes'] = None
+    st.session_state['metrics'] = {'unique': 0, 'missing': 0}
+    st.session_state['facility_numbers_text_area'] = ''
+    st.session_state['csv_uploader_key_version'] += 1
 
 # --- UI ELEMENT 1: Text Box for Facility Numbers ---
 st.subheader("1. Enter Facility Numbers")
 raw_copied_text = st.text_area(
-    "Paste your Facility Numbers here.", 
-    value=st.session_state['raw_copied_text'],
-    height=150, 
+    "Paste your Facility Numbers here.",
+    height=150,
     key='facility_numbers_text_area',
 )
 
 
 # --- UI ELEMENT 2: File Uploader ---
 st.subheader("2. Upload CSV Files")
-uploaded_files = st.file_uploader("Upload CSV files here.", type="csv", accept_multiple_files=True, key='csv_uploader')
+uploaded_files = st.file_uploader(
+    "Upload CSV files here.",
+    type="csv",
+    accept_multiple_files=True,
+    key=f"csv_uploader_{st.session_state['csv_uploader_key_version']}",
+)
 
 
 # --- UI ELEMENT 3: Process Button ---
@@ -189,11 +208,4 @@ if st.session_state.get('show_results', False):
         key='download_audit_log_btn'
     )
     # --- Clear All Data Button ---
-    if st.button("Clear All Data", key='clear_all_btn', type="primary"):
-        st.session_state['raw_copied_text'] = ''
-        st.session_state['uploaded_files'] = []
-        st.session_state['show_results'] = False
-        st.session_state['main_excel_bytes'] = None
-        st.session_state['audit_excel_bytes'] = None
-        st.session_state['metrics'] = {'unique': 0, 'missing': 0}
-        st.experimental_rerun()
+    st.button("Clear All Data", key='clear_all_btn', type="primary", on_click=clear_all_data)
